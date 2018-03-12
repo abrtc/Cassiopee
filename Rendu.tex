@@ -1,0 +1,216 @@
+\documentclass{report}
+
+\usepackage[latin1]{inputenc} % un package
+\usepackage[T1]{fontenc}      % un second package
+\usepackage[french]{babel}  % un troisième package
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathrsfs}
+
+
+\newcommand{\entiers}[2]{\llbracket #1,#2\rrbracket} 
+\newtheorem*{theo}{Théorème}
+\newtheorem{prop}{Propriété}[chapter]  
+\newtheorem{defi}{Définition}[chapter]
+\newtheorem{petit_nom3}{Définition}[section]
+
+\title{Projet \bsc{Cassiopée}: Méthodes algébriques d'inversion de systèmes polynomiaux}
+\author{Clément \bsc{Aubert} - Erwan \bsc{Tesson}}
+\date{18 février 2018}
+
+\begin{document}
+
+\maketitle
+\newpage
+
+\part{Bases de Gröbner}
+\chapter{Rappels d'Algèbre}
+\section{Définitions}
+
+\begin{defi}
+\normalfont Soit $A$ un ensemble de deux lois de composition interne $+$ et $\times$. On dit que $(A,+,\times)$ est un \textit{anneau} si :
+\begin{itemize}
+\item $(A,+)$ est un groupe commutatif
+\item $\times$ est associative.
+\item $\times$ est distributive par rapport à l'addition.
+\end{itemize}
+\end{defi}
+
+
+\begin{defi}
+\normalfont Une partie $I$ de l'anneau $A$ est appelé \textit{idéal} de l'anneau $A$ si:
+\begin{itemize}
+\item $(I,+)$ est un sous-groupe de $(A,+)$
+\item $\forall x\in I$ et $\forall  a \in A$, alors $ax$ et $xa$ sont éléments de $I$. 
+\end{itemize}
+\end{defi}
+
+
+\begin{defi}
+\normalfont On appelle \textit{idéal} de $K[x_{1},...,x_{n}]$ toute partie $I$ de $K[x_{1},...,x_{n}]$ vérifiant:
+\begin{itemize}
+\item le polynome nul est dans $I$
+\item si $P_{1}$ et $P_{2}$ sont dans $I$, il en est de même pour $P_{1}-P_{2}$
+\item si $P$ est dans $I$ et si $Q$ est un polynôme quelconque, $PQ$ appartient à $I$.
+\end{itemize}
+\end{defi}
+
+
+\begin{prop} 
+\normalfont L'ordre doit être total, compatible à la multiplication et bien ordonné :
+\begin{itemize}
+\item $\textsc{lex}_{X_{1}>X_{2}>...>X_{n}}$ : le plus grand monôme est celui qui contient le plus de $X_{1}$, puis le plus de $X_{2}$ 
+\item $\textsc{deglex}_{X_{1}>X_{2}>...>X_{n}}$ : par degrès puis par ordre $\textsc{lex}_{X_{1}>X_{2}>...>X_{n}}$
+\item $\textsc{degrevlex}_{X_{1}>X_{2}>...>X_{n}}$ : par degrès puis par ordre $\textsc{lex}_{X_{1}>X_{2}>...>X_{n}}$ "inversé"
+\end{itemize}
+\end{prop}
+
+\begin{theo}
+(Hilbert) \normalfont Pour tout Idéal $I$ de $K[x_{1},...,x_{n}]$, il existe un système fini de générateur $(g_{1},...,g_{k})$ de polynômes tel que $I =$ Id$(g_{1},...,g_{k})$
+\end{theo}
+
+\begin{theo} \normalfont (Croissance d'idéaux) Si $(I_{i})_{i \in \mathbb{N}}$ une famille d'idéaux tels que : \\
+\begin{center}
+$I_{1} \subset I_{2} \subset I_{3} \subset ...$ \\
+\end{center}
+alors $\exists N \in \mathbb{N}$ tel que \\
+\begin{center}
+$I_{N} = I_{N+1} = I_{N+2} = ...$ 
+\end{center}
+\end{theo}
+
+\section{Notations}
+\begin{itemize}
+\item $K[x_{1},...,x_{n}]$ : l'anneau des polynomes à valeur dans $K$
+\end{itemize}
+
+\newpage
+\chapter{Bases de Gröbner}
+\section{Définition}
+\begin{defi} \normalfont
+On fixe un ordre monomial. Soit $I=\left\langle f_{1},...,f_{m}\right\rangle $ un idéal de $K[x_{1},...,x_{n}]$ 
+\begin{itemize}
+	\item LT$(I)=\left\langle \left\{lt(f) : f\in I \right\} \right\rangle$ est appelé idéal initial de $I$
+	\item $\left\{g_{1},...,g_{s}\right\} \subset I$ est une base de Gröbner de $I$ si : 
+	\\ \begin{center}
+	$\left\langle lt(g_{1}),...,lt(g_{s}) \right\rangle=  $LT$(I)$ 
+	\end{center}
+\end{itemize}
+\end{defi}
+
+\begin{prop}
+\normalfont
+Soit $f \in K[x_{1},...,x_{n}]$,si $G$ est une base de Gröbner de $I=\left\langle f_{1},...,f_{m} \right\rangle$ alors :
+\medskip
+\begin{itemize}
+\item $\overline{f^{G}} = 0 \Leftrightarrow f \in I$
+\medskip
+\item le reste $\overline{f^{G}}$ est unique 
+\end{itemize}
+\end{prop}
+
+\chapter{Résolution de systèmes polynomiaux}
+\section{Définitions}
+\begin{defi}
+Soit $(f_{1},f_{2},...,f_{s}) \in K[x_{1},...,x_{n}]$, on définit une variété affine comme :\\
+\begin{center}
+$\textbf{V} (f_{1},f_{2},...,f_{s}) = \left\{ (a_{1},...,a_{n}) \in k^{n} : f_{i} (a_{1},...,a_{n}) = 0  ,  \forall i \in [1,s]  \right\}$
+\end{center}
+\end{defi}
+
+\section{Théorie de l'élimination}
+\begin{defi}
+\normalfont
+$I_{I} = I\cap K[x_{I+1},...,x_{n}]$ est un idéal de $K[x_{I+1},...,x_{n}]$ appelé  $I$-ème idéal d'élimination. 
+\end{defi}
+
+\newpage
+
+\part{Exemples d'utilisation des Bases de Gröbner}
+\chapter{Réduction par le pivot de Gauss}
+{\bfseries Principe}
+
+La méthode du pivot de Gauss est un procédé qui résulte des bases de Gröbner. 
+
+{\bfseries Exemple}
+\medskip 
+\\
+On a $F$= \embrace{\{\2x+3y+4z-5, 3x+4y+5z-2\}}. 
+\newline On cherche à simplifier l'expression de $F$
+
+$$
+\Leftrightarrow S = \left\{
+    \begin{array}{ll}
+        2x+3y+4z=5 \\
+        3x+4y+5z=2
+    \end{array}
+\right.
+$$
+
+$$
+\Leftrightarrow S = \left\{
+    \begin{array}{ll}
+        2x+3y+4z=5 \\
+            y+2z=11
+    \end{array}
+\right.
+$$
+
+$$
+\Leftrightarrow S = \left\{
+    \begin{array}{ll}
+        2x   -2z=-28 \\
+            y+2z=11
+    \end{array}
+\right.
+$$
+
+$$
+\Leftrightarrow S = \left\{
+    \begin{array}{ll}
+        x=z-14 \\
+        y=-2z+11
+    \end{array}
+\right.
+$$
+
+\\
+On a donc $G$= \embrace{\{\x-z+14, y+2z-11\}}. 
+
+
+\medskip
+
+
+\newpage
+{\bfseries Bibliographie}
+\newline
+Voici la liste des documents utilisés pour nos recherches:
+\begin{itemize}
+\item https://moodle.polytechnique.fr/pluginfile.php/66308/mod_resource/content/3/Cours8.pdf
+\newline
+\item http://denis.monasse.free.fr/denis/articles/grobner.pdf
+\newline
+\item http://www.lifl.fr/jncf2015/files/lecture-notes/faugere.pdf
+\newline
+\item http://iml.univ-mrs.fr/~kohel/tch/M2-Agreg/CM/08_geometrie_suite.pdf
+\end{itemize}
+
+\newline
+\newline
+Ces documents s'ajoutent à ceux proposés sur le sujet de notre projet Cassiopée:
+\begin{itemize}
+\item J.-F. Cardoso. Blind signal separation : statistical principles. Proc. IEEE, 9(10) :20092025,
+Oct. 1998.
+\newline
+\item M. Castella. Inversion of polynomial systems and separation of nonlinear mixtures of
+nite-alphabet sources. IEEE Trans. Signal Process., 56(8, Part 2) :39053917, Aug. 2008.
+\newline
+\item P. Comon. Independent component analysis, a new concept ? Signal Process., 36(3) :287
+314, Apr. 1994.
+\newline
+\item D. Cox, J. Little, and D. O'Shea. Ideal, Varieties, and Algorithms. Springer, third edition
+edition, 2007.
+\end{itemize}
+
+\end{document}
